@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:csv_app/src/model/csv_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,17 +29,19 @@ class CounterStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/hello.csv');
+    return File('$path/data.csv');
   }
 
   Future<int> readCounter() async {
     try {
+
       final file = await _localFile;
 
       // Read the file
       String contents = await file.readAsString();
 
       return int.parse(contents);
+
     } catch (e) {
       // If encountering an error, return 0
       return 0;
@@ -48,28 +51,34 @@ class CounterStorage {
   Future<File> writeCounter(int counter) async {
     
     List<List<dynamic>> rows = List<List<dynamic>>();
-    List associate = ['cristian','m','25'];
+    CsvModel associate = new CsvModel();
+
+    associate.id = 1;
+    associate.nombre = "cristian";
+    associate.edad = 25;
     
-    for (int i = 0; i <associate.length;i++) {
+    for (int i = 0; i < associate.toString().length; i++) {
     List<dynamic> row = List();
-    row.add('name');
-    row.add('gender');
-    row.add('age');
+    row.add(associate.id);
+    row.add(associate.nombre);
+    row.add(associate.edad);
 
     rows.add(row);
 
     print(rows);
 
     }
+
     //store file in documents folder
-    File f = new File("/data/user/0/com.example.csv/app_flutter/hello.csv");
+    // File f = new File("/data/user/0/com.example.csv/app_flutter/hello.csv");
 
     // convert rows to String and write as csv file
     String csv = const ListToCsvConverter().convert(rows);
-    f.writeAsString(csv);
+    // return f.writeAsString(counter);
+    final file = await _localFile;
 
     // // Write the file
-    // return file.writeAsString('$counter');
+    return file.writeAsString(csv);
   }
 }
 
@@ -109,7 +118,7 @@ class _FlutterDemoState extends State<FlutterDemo> {
 
   share() async {
     final ByteData bytes = await rootBundle.load('/data/user/0/com.example.csv/app_flutter/hello.csv');
-    await Share.file('esys image', 'hello.csv', bytes.buffer.asUint8List(), 'image/png');
+    await Share.file('esys image', 'data.csv', bytes.buffer.asUint8List(), 'image/png');
   }
 
 
@@ -132,8 +141,6 @@ class _FlutterDemoState extends State<FlutterDemo> {
             )
           ],
         ) 
-        
-        
       ),
       
       floatingActionButton: FloatingActionButton(
